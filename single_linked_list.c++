@@ -41,6 +41,7 @@ vector<node*> debug_data;
 
 void debug_add_node(node*node){
   debug_data.emplace_back(node);
+    cout<<"node added successfully"<<endl;
 }
 
 void debud_remove_node(node*node){
@@ -49,7 +50,7 @@ void debud_remove_node(node*node){
     	cout << "Node does not exist"<<endl;
   else{
     debug_data.erase(it);
-    cout<<"node removed successfully";
+    cout<<"node removed successfully"<<endl;
   }
 }
 
@@ -154,6 +155,15 @@ void print(){
     // delete node from the list
     delete node;
   }
+   node* get_nth(int n) {
+    // 1 based
+		int cnt = 0;
+		for (node* cur = head; cur; cur = cur->next)
+			if (++cnt == n)
+				return cur;
+
+		return nullptr;
+	}
   void delete_front(){
     if(!length)
       return;
@@ -161,7 +171,68 @@ void print(){
     delete_node(head);
     cur=head;   
   }
+void delete_first(){
+  // if list is empty 
+  if(!head)
+    return;
+  // if list length >=1
+  node*cur=head;
+  head=head->next;
+  //tip order matters take the next first especially for deleting
+  // u must move the head then remove current 
+  delete_node(cur);
+  // if list is empty now we take care of tail 
 
+  if(!head)
+    tail=nullptr;
+  // for data itegrity
+  debug_verify_data_integrity();
+
+}
+void delete_last(){
+  // check if list is has data
+  if(length<=1)
+  {
+    delete_first();
+    return;
+  }
+  // get the length -1 node and delete the last node(tail)
+  // then make tail == the length - 1 node
+  node * previous=get_nth(length-1);
+  delete_node(tail);
+  tail=previous;
+  tail->next=nullptr;
+
+  // for data integrity 
+  debug_verify_data_integrity();
+  
+}
+void delete_nth_node(int n){
+  if(n<1 or n >length){
+    cout<<" ERROR NO SUCH NODE"<<endl;
+  }
+  else if(n==length)
+  {
+    delete_last();
+    return;
+  }
+  else if(n==1)
+  {
+    delete_first();
+  }
+  else{
+    // we need to connect the n-1 node with n+1 node so 
+    // so ((n-1)->next == (n)->next) 
+    //so then (n-1) node will be connected with (n+1) node 
+    //then delete the n node ; 
+    node *before_nth=get_nth(n-1);
+    node *nth=before_nth->next;
+    before_nth->next=nth->next;
+    delete_node(nth);
+    // for integrity
+    debug_verify_data_integrity();
+  }
+}
   void add_node(node* node) {
     // add this node to debug_data vector first 
 		debug_add_node(node);
@@ -192,15 +263,7 @@ void insert_front(int value) {
 		if(length == 1)
 			tail = head;
 	}
-  node* get_nth(int n) {
-    // 1 based
-		int cnt = 0;
-		for (node* cur = head; cur; cur = cur->next)
-			if (++cnt == n)
-				return cur;
-
-		return nullptr;
-	}
+ 
 };
 int main() {
 //  node *node1=new node(13);
@@ -221,13 +284,17 @@ list.insert_end(11);
 list.insert_end(12);
 list.insert_end(13);
 list.insert_end(14);
-list.print();
 
 cout<<" ***************"<<endl;
 list.debug_print_address();
 cout<<" ***************"<<endl;
 list.debug_to_string();
 cout<<" ***************"<<endl;
-cout<<list.get_nth(2)->data;
+cout<<list.get_nth(3)->data<<endl;
+// list.delete_first();
+// list.delete_last();
+list.delete_nth_node(3);
+list.print();
+
 	return 0;
 }
